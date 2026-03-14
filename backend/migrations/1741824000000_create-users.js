@@ -6,6 +6,7 @@ export const up = (pgm) => {
     id: { type: 'serial', primaryKey: true },
     name: { type: 'text', notNull: true },
     email: { type: 'text', notNull: true, unique: true },
+    password_hash: { type: 'text', notNull: true },
     created_at: {
       type: 'timestamptz',
       notNull: true,
