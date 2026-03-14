@@ -1,0 +1,42 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import { useAuthInit } from './hooks/useAuthInit';
+import Analytics from './pages/Analytics';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import NotFound from './pages/NotFound';
+import Profile from './pages/Profile';
+import Register from './pages/Register';
+import TaskDetail from './pages/TaskDetail';
+import Tasks from './pages/Tasks';
+
+function App() {
+  const ready = useAuthInit();
+
+  if (!ready) return null;
+
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/tasks/:id" element={<TaskDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/analytics" element={<Analytics />} />
+          </Route>
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
