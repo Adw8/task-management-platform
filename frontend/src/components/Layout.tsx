@@ -21,7 +21,7 @@ export default function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="sidebar-logo">TaskManager</div>
+        <div className="sidebar-logo">Task Tracker</div>
         <nav className="sidebar-nav">
           {navItems.map(({ to, label }) => (
             <NavLink
