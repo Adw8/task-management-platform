@@ -1,7 +1,7 @@
 /**
  * @param {import('node-pg-migrate').MigrationBuilder} pgm
  */
-export const up = (pgm) => {
+exports.up = (pgm) => {
   pgm.createTable('users', {
     id: { type: 'serial', primaryKey: true },
     name: { type: 'text', notNull: true },
@@ -18,6 +18,6 @@ export const up = (pgm) => {
 /**
  * @param {import('node-pg-migrate').MigrationBuilder} pgm
  */
-export const down = (pgm) => {
+exports.down = (pgm) => {
   pgm.dropTable('users');
 };

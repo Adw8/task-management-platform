@@ -2,14 +2,10 @@ import bcrypt from 'bcrypt';
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import pool from '../db';
+import { requireEnv } from '../utils/env';
 
 const router = Router();
-
-function requireEnv(key: string): string {
-  const value = process.env[key];
-  if (!value) throw new Error(`Missing env var: ${key}`);
-  return value;
-}
+const JWT_SECRET = requireEnv('JWT_SECRET');
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body as { email: string; password: string };
@@ -27,7 +23,7 @@ router.post('/login', async (req, res) => {
     return;
   }
 
-  const token = jwt.sign({ sub: user.id, email: user.email }, requireEnv('JWT_SECRET'), {
+  const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
     expiresIn: '7d',
   });
 
