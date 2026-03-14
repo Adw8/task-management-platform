@@ -7,6 +7,39 @@ import { requireEnv } from '../utils/env';
 const router = Router();
 const JWT_SECRET = requireEnv('JWT_SECRET');
 
+router.post('/register', async (req, res) => {
+  const { name, email, password } = req.body as {
+    name: string;
+    email: string;
+    password: string;
+  };
+
+  if (!name || !email || !password) {
+    res.status(400).json({ error: 'name, email and password are required' });
+    return;
+  }
+
+  if (password.length < 8) {
+    res.status(400).json({ error: 'password must be at least 8 characters' });
+    return;
+  }
+
+  const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+  if (existing.rows.length > 0) {
+    res.status(409).json({ error: 'email already in use' });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  const result = await pool.query(
+    'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
+    [name, email, passwordHash],
+  );
+
+  res.status(201).json(result.rows[0]);
+});
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body as { email: string; password: string };
 
@@ -15,7 +48,10 @@ router.post('/login', async (req, res) => {
     return;
   }
 
-  const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  const result = await pool.query(
+    'SELECT id, email, password_hash FROM users WHERE email = $1',
+    [email],
+  );
   const user = result.rows[0];
 
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
