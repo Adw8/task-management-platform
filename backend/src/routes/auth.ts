@@ -8,6 +8,8 @@ import { requireEnv } from '../utils/env';
 const router = Router();
 const JWT_SECRET = requireEnv('JWT_SECRET');
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body as {
     name: string;
@@ -20,25 +22,34 @@ router.post('/register', async (req, res) => {
     return;
   }
 
+  if (!EMAIL_REGEX.test(email)) {
+    res.status(400).json({ error: 'invalid email address' });
+    return;
+  }
+
   if (password.length < 8) {
     res.status(400).json({ error: 'password must be at least 8 characters' });
     return;
   }
 
-  const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
-  if (existing.rows.length > 0) {
-    res.status(409).json({ error: 'email already in use' });
-    return;
+  try {
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (existing.rows.length > 0) {
+      res.status(409).json({ error: 'email already in use' });
+      return;
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
+      [name, email, passwordHash],
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch {
+    res.status(500).json({ error: 'internal server error' });
   }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  const result = await pool.query(
-    'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
-    [name, email, passwordHash],
-  );
-
-  res.status(201).json(result.rows[0]);
 });
 
 router.post('/login', async (req, res) => {
@@ -49,22 +60,26 @@ router.post('/login', async (req, res) => {
     return;
   }
 
-  const result = await pool.query(
-    'SELECT id, email, password_hash FROM users WHERE email = $1',
-    [email],
-  );
-  const user = result.rows[0];
+  try {
+    const result = await pool.query(
+      'SELECT id, email, password_hash FROM users WHERE email = $1',
+      [email],
+    );
+    const user = result.rows[0];
 
-  if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-    res.status(401).json({ error: 'invalid credentials' });
-    return;
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      res.status(401).json({ error: 'invalid credentials' });
+      return;
+    }
+
+    const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
+    res.json({ token });
+  } catch {
+    res.status(500).json({ error: 'internal server error' });
   }
-
-  const token = jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: '7d',
-  });
-
-  res.json({ token });
 });
 
 router.get('/me', authenticate, async (_req, res) => {
@@ -74,17 +89,21 @@ router.get('/me', authenticate, async (_req, res) => {
     return;
   }
 
-  const result = await pool.query(
-    'SELECT id, name, email, created_at FROM users WHERE id = $1',
-    [userId],
-  );
+  try {
+    const result = await pool.query(
+      'SELECT id, name, email, created_at FROM users WHERE id = $1',
+      [userId],
+    );
 
-  if (result.rows.length === 0) {
-    res.status(404).json({ error: 'user not found' });
-    return;
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'user not found' });
+      return;
+    }
+
+    res.json(result.rows[0]);
+  } catch {
+    res.status(500).json({ error: 'internal server error' });
   }
-
-  res.json(result.rows[0]);
 });
 
 export default router;

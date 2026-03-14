@@ -1,15 +1,21 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import { useAuthInit } from './hooks/useAuthInit';
 import Analytics from './pages/Analytics';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 import Profile from './pages/Profile';
 import Register from './pages/Register';
 import TaskDetail from './pages/TaskDetail';
 import Tasks from './pages/Tasks';
 
 function App() {
+  const ready = useAuthInit();
+
+  if (!ready) return null;
+
   return (
     <BrowserRouter>
       <Routes>
@@ -26,6 +32,8 @@ function App() {
             <Route path="/analytics" element={<Analytics />} />
           </Route>
         </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

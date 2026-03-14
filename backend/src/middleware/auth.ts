@@ -15,6 +15,10 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
 
   try {
     const payload = jwt.verify(token, JWT_SECRET);
+    if (typeof payload === 'string') {
+      res.status(401).json({ error: 'invalid token' });
+      return;
+    }
     res.locals['user'] = payload;
     next();
   } catch {
