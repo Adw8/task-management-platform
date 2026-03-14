@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 
 const app = express();
@@ -12,6 +13,7 @@ app.get('/health', async (_req, res) => {
 });
 
 app.use('/users', usersRouter);
+app.use('/auth', authRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
