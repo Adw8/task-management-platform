@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Analytics from './pages/Analytics';
 import Dashboard from './pages/Dashboard';
@@ -16,12 +17,14 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/tasks/:id" element={<TaskDetail />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/analytics" element={<Analytics />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/tasks/:id" element={<TaskDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/analytics" element={<Analytics />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
