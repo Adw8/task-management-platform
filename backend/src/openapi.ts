@@ -496,6 +496,36 @@ const spec: OpenAPIV3.Document = {
         },
       },
     },
+
+    '/users': {
+      get: {
+        summary: 'List all users',
+        description: 'Returns all registered users. Used to populate assignee dropdowns. This is a shared workspace — all authenticated users can see all tasks and all users.',
+        tags: ['Users'],
+        security: [bearerAuth],
+        responses: {
+          '200': {
+            description: 'User list',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      id:    { type: 'integer' },
+                      name:  { type: 'string' },
+                      email: { type: 'string', format: 'email' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+        },
+      },
+    },
   },
 };
 

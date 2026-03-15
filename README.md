@@ -166,6 +166,12 @@ All routes except `/auth/register`, `/auth/login`, and `/health` require `Author
 | GET    | `/tasks/:taskId/files/:fileId`      | Download a file                |
 | DELETE | `/tasks/:taskId/files/:fileId`      | Delete file (uploader only)    |
 
+### Users
+
+| Method | Endpoint  | Description       |
+|--------|-----------|-------------------|
+| GET    | `/users`  | List all users    |
+
 ### Analytics
 
 | Method | Endpoint                | Description                                    |
@@ -198,6 +204,7 @@ All routes except `/auth/register`, `/auth/login`, and `/health` require `Author
 - **Zustand over Redux** — less boilerplate, sufficient for auth state + task cache.
 - **Token stored in localStorage** — acceptable for this scope; the 401 interceptor clears stale tokens automatically.
 - **Rate limiting on /auth** — 10 requests per 15 minutes per IP to limit brute-force attempts.
+- **Shared workspace model** — all authenticated users see all tasks, consistent with the assignment spec. Tasks are not scoped per user; `assigned_to` indicates responsibility but does not restrict visibility.
 - **Server-side CSV export** — `GET /tasks/export` streams CSV row-by-row from the database rather than building the full dataset client-side. Avoids loading all task data into browser memory and keeps the download logic out of the frontend bundle. The endpoint accepts `status`, `priority`, and `tags` filters. Search is intentionally excluded — exports are meant for bulk data extraction, not search result snapshots.
 
 ---
