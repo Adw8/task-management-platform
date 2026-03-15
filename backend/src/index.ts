@@ -4,6 +4,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import authRouter from './routes/auth';
+import tasksRouter from './routes/tasks';
 
 const app = express();
 const PORT = process.env['PORT'] ?? 3000;
@@ -28,6 +29,7 @@ app.get('/health', async (_req, res) => {
 
 app.use('/auth', authLimiter);
 app.use('/auth', authRouter);
+app.use('/tasks', tasksRouter);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
