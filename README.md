@@ -201,6 +201,7 @@ All routes except `/auth/register`, `/auth/login`, and `/health` require `Author
 - **Soft deletes** — `deleted_at` column on tasks; all queries filter `WHERE deleted_at IS NULL`.
 - **Authorization** — creator or assigned user can update a task; only the creator can delete it.
 - **JWT in Authorization header** — simpler than httpOnly cookies for this scope.
+- **User list cached in Zustand** — `GET /users` is fetched once on first access and reused across `TaskFormModal`, `TaskDetail`, and the task list. Avoids redundant requests on every mount without adding a data-fetching library.
 - **Zustand over Redux** — less boilerplate, sufficient for auth state + task cache.
 - **Token stored in localStorage** — acceptable for this scope; the 401 interceptor clears stale tokens automatically.
 - **Rate limiting on /auth** — 10 requests per 15 minutes per IP to limit brute-force attempts.

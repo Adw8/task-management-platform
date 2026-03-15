@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { exportTasks } from '../api/tasks';
-import { getUsers, type UserSummary } from '../api/users';
 import TaskFormModal from '../components/TaskFormModal';
 import useTaskStore from '../store/taskStore';
+import useUsersStore from '../store/usersStore';
 import type { Task, TaskPriority, TaskStatus } from '../types/task';
 import '../styles/tasks.css';
 
@@ -51,9 +51,9 @@ export default function Tasks() {
     useTaskStore();
 
   const [search, setSearch] = useState(filters.search ?? '');
-  const [users, setUsers] = useState<UserSummary[]>([]);
+  const { users, fetch: fetchUsers } = useUsersStore();
 
-  useEffect(() => { getUsers().then(setUsers).catch(() => {}); }, []);
+  useEffect(() => { fetchUsers().catch(() => {}); }, [fetchUsers]);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [editTarget, setEditTarget] = useState<number | null>(null);

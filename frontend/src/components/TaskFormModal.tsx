@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getTask } from '../api/tasks';
-import { getUsers, type UserSummary } from '../api/users';
 import useTaskStore from '../store/taskStore';
+import useUsersStore from '../store/usersStore';
 import type { TaskPriority, TaskStatus } from '../types/task';
 import '../styles/task-form-modal.css';
 
@@ -37,15 +37,15 @@ export default function TaskFormModal({ onClose, taskId }: Props) {
   const { createTask, updateTask } = useTaskStore();
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
-  const [users, setUsers] = useState<UserSummary[]>([]);
+  const { users, fetch: fetchUsers } = useUsersStore();
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
 
   useEffect(() => {
-    getUsers().then(setUsers).catch(() => {});
-  }, []);
+    fetchUsers().catch(() => {});
+  }, [fetchUsers]);
 
   useEffect(() => {
     if (!isEdit || !taskId) return;

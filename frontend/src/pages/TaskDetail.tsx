@@ -4,14 +4,14 @@ import Comments from '../components/Comments';
 import FileUpload from '../components/FileUpload';
 import TaskFormModal from '../components/TaskFormModal';
 import { getTask } from '../api/tasks';
-import { getUsers, type UserSummary } from '../api/users';
 import useTaskStore from '../store/taskStore';
+import useUsersStore from '../store/usersStore';
 import type { Task } from '../types/task';
 import '../styles/task-detail.css';
 
 function AssigneeName({ userId }: { userId: number | null }) {
-  const [users, setUsers] = useState<UserSummary[]>([]);
-  useEffect(() => { getUsers().then(setUsers).catch(() => {}); }, []);
+  const { users, fetch: fetchUsers } = useUsersStore();
+  useEffect(() => { fetchUsers().catch(() => {}); }, [fetchUsers]);
   if (!userId) return <>—</>;
   const user = users.find((u) => u.id === userId);
   return <>{user ? user.name : '—'}</>;
