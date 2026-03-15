@@ -81,6 +81,21 @@ npm install
 npm run dev
 ```
 
+### Production
+
+```bash
+# Backend — compile and run
+cd backend
+npm run build       # tsc → dist/
+npm start           # node dist/index.js
+
+# Frontend — build static assets
+cd frontend
+npm run build       # tsc + vite build → dist/
+# Serve dist/ with any static file server (nginx, Caddy, etc.)
+# Set VITE_API_URL to your backend's public URL before building
+```
+
 ---
 
 ## Environment Variables
@@ -88,9 +103,14 @@ npm run dev
 ### `backend/.env`
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/taskdb
-JWT_SECRET=your_jwt_secret_here
+PGHOST=localhost
+PGPORT=5433
+PGUSER=postgres
+PGPASSWORD=your_postgres_password
+PGDATABASE=taskmanager
+
 PORT=3000
+JWT_SECRET=your_jwt_secret_here
 CLIENT_URL=http://localhost:5173
 ```
 
