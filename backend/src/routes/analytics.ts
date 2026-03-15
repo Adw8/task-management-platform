@@ -50,6 +50,44 @@ router.get('/overview', async (_req, res, next) => {
   }
 });
 
+// GET /analytics/performance
+router.get('/performance', async (_req, res, next) => {
+  try {
+    const { rows } = await pool.query<{
+      user_id: number;
+      user_name: string;
+      total: string;
+      done: string;
+      in_progress: string;
+    }>(
+      `SELECT
+         u.id         AS user_id,
+         u.name       AS user_name,
+         COUNT(t.id)                                        AS total,
+         COUNT(t.id) FILTER (WHERE t.status = 'done')      AS done,
+         COUNT(t.id) FILTER (WHERE t.status = 'in_progress') AS in_progress
+       FROM users u
+       LEFT JOIN tasks t
+         ON (t.assigned_to = u.id OR t.created_by = u.id)
+         AND t.deleted_at IS NULL
+       GROUP BY u.id, u.name
+       ORDER BY done DESC, total DESC`
+    );
+
+    res.json(
+      rows.map((r) => ({
+        user_id:     r.user_id,
+        user_name:   r.user_name,
+        total:       Number(r.total),
+        done:        Number(r.done),
+        in_progress: Number(r.in_progress),
+      }))
+    );
+  } catch (err) {
+    next(err);
+  }
+});
+
 // GET /analytics/trends
 router.get('/trends', async (_req, res, next) => {
   try {
