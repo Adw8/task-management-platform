@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  deleteFile, getFileDownloadUrl, getFiles, uploadFiles, type TaskFile,
+  deleteFile, downloadFile, getFiles, uploadFiles, type TaskFile,
 } from '../api/files';
 import '../styles/file-upload.css';
 
@@ -89,13 +89,12 @@ export default function FileUpload({ taskId }: Props) {
             <li key={f.id} className="file-item">
               <span className="file-icon">{f.mime_type.startsWith('image/') ? '🖼️' : '📄'}</span>
               <div className="file-info">
-                <a
-                  href={getFileDownloadUrl(taskId, f.id)}
+                <button
                   className="file-name"
-                  download={f.original_name}
+                  onClick={() => downloadFile(taskId, f.id, f.original_name)}
                 >
                   {f.original_name}
-                </a>
+                </button>
                 <span className="file-meta">{formatBytes(f.size)} · {f.uploaded_by}</span>
               </div>
               <button className="btn-file-delete" onClick={() => handleDelete(f.id)} title="Delete file">×</button>

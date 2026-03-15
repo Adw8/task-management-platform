@@ -35,7 +35,7 @@ export default function Comments({ taskId }: Props) {
     setSubmitting(true);
     try {
       const comment = await createComment(taskId, body.trim());
-      setComments((prev) => [...prev, { ...comment, user_id: currentUser!.id, user_name: currentUser!.name }]);
+      setComments((prev) => [...prev, { ...comment, user_id: Number(currentUser!.id), user_name: currentUser!.name }]);
       setBody('');
     } finally {
       setSubmitting(false);

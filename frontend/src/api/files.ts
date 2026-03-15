@@ -27,7 +27,12 @@ export async function deleteFile(taskId: number, fileId: number): Promise<void> 
   await client.delete(`/tasks/${taskId}/files/${fileId}`);
 }
 
-export function getFileDownloadUrl(taskId: number, fileId: number): string {
-  const base = import.meta.env['VITE_API_URL'] ?? '';
-  return `${base}/tasks/${taskId}/files/${fileId}`;
+export async function downloadFile(taskId: number, fileId: number, originalName: string): Promise<void> {
+  const res = await client.get(`/tasks/${taskId}/files/${fileId}`, { responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = originalName;
+  a.click();
+  URL.revokeObjectURL(url);
 }
