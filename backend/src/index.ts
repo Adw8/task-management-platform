@@ -3,6 +3,7 @@ import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import analyticsRouter from './routes/analytics';
 import authRouter from './routes/auth';
 import tasksRouter from './routes/tasks';
 
@@ -30,6 +31,7 @@ app.get('/health', async (_req, res) => {
 app.use('/auth', authLimiter);
 app.use('/auth', authRouter);
 app.use('/tasks', tasksRouter);
+app.use('/analytics', analyticsRouter);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
