@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import TaskFormModal from '../components/TaskFormModal';
 import useTaskStore from '../store/taskStore';
 import type { Task, TaskPriority, TaskStatus } from '../types/task';
 import '../styles/tasks.css';
@@ -44,16 +45,17 @@ function ConfirmDialog({
 }
 
 export default function Tasks() {
-  const navigate = useNavigate();
   const { tasks, pagination, filters, loading, error, fetchTasks, deleteTask, setFilters, resetFilters } =
     useTaskStore();
 
   const [search, setSearch] = useState(filters.search ?? '');
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [showNewModal, setShowNewModal] = useState(false);
+  const [editTarget, setEditTarget] = useState<number | null>(null);
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
   // Debounce search
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function Tasks() {
       fetchTasks({ search: search || undefined });
     }, 300);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, fetchTasks, setFilters]);
 
   function handleFilterChange(key: string, value: string) {
     const update = { [key]: value || undefined };
@@ -101,7 +103,7 @@ export default function Tasks() {
     <div className="tasks-page">
       <div className="page-header">
         <h1>Tasks</h1>
-        <button className="btn-new-task" onClick={() => navigate('/tasks/new')}>
+        <button className="btn-new-task" onClick={() => setShowNewModal(true)}>
           + New Task
         </button>
       </div>
@@ -217,7 +219,7 @@ export default function Tasks() {
                       <div className="row-actions">
                         <button
                           className="btn-action btn-edit"
-                          onClick={() => navigate(`/tasks/${task.id}/edit`)}
+                          onClick={() => setEditTarget(task.id)}
                         >
                           Edit
                         </button>
@@ -267,6 +269,14 @@ export default function Tasks() {
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
         />
+      )}
+
+      {showNewModal && (
+        <TaskFormModal onClose={() => setShowNewModal(false)} />
+      )}
+
+      {editTarget !== null && (
+        <TaskFormModal taskId={editTarget} onClose={() => setEditTarget(null)} />
       )}
     </div>
   );
