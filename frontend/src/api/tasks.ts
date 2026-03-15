@@ -29,3 +29,13 @@ export async function bulkCreateTasks(tasks: CreateTaskPayload[]): Promise<Task[
   const res = await client.post<Task[]>('/tasks/bulk', { tasks });
   return res.data;
 }
+
+export async function exportTasks(filters: Pick<TaskFilters, 'status' | 'priority' | 'tags'>): Promise<void> {
+  const res = await client.get('/tasks/export', { params: filters, responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tasks-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
