@@ -14,7 +14,7 @@ export function useAuthInit() {
       .then((user) => setUser(user))
       .catch(() => logout())
       .finally(() => setReady(true));
-  }, []);
+  }, [token, setUser, logout]);
 
   return ready;
 }
