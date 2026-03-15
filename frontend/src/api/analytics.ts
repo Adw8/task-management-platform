@@ -13,3 +13,14 @@ export async function getOverview(): Promise<OverviewStats> {
   const res = await client.get<OverviewStats>('/analytics/overview');
   return res.data;
 }
+
+export interface TrendPoint { date: string; count: number; }
+export interface TrendsData {
+  created:   TrendPoint[];
+  completed: TrendPoint[];
+}
+
+export async function getTrends(): Promise<TrendsData> {
+  const res = await client.get<TrendsData>('/analytics/trends');
+  return res.data;
+}

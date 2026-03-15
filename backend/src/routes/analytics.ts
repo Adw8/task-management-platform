@@ -50,4 +50,33 @@ router.get('/overview', async (_req, res, next) => {
   }
 });
 
+// GET /analytics/trends
+router.get('/trends', async (_req, res, next) => {
+  try {
+    const [createdResult, completedResult] = await Promise.all([
+      pool.query<{ date: string; count: string }>(
+        `SELECT DATE(created_at)::text AS date, COUNT(*) AS count
+         FROM tasks
+         WHERE deleted_at IS NULL AND created_at >= NOW() - INTERVAL '30 days'
+         GROUP BY DATE(created_at)
+         ORDER BY date ASC`
+      ),
+      pool.query<{ date: string; count: string }>(
+        `SELECT DATE(updated_at)::text AS date, COUNT(*) AS count
+         FROM tasks
+         WHERE deleted_at IS NULL AND status = 'done' AND updated_at >= NOW() - INTERVAL '30 days'
+         GROUP BY DATE(updated_at)
+         ORDER BY date ASC`
+      ),
+    ]);
+
+    res.json({
+      created:   createdResult.rows.map((r) => ({ date: r.date, count: Number(r.count) })),
+      completed: completedResult.rows.map((r) => ({ date: r.date, count: Number(r.count) })),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
