@@ -95,15 +95,40 @@
 }
 
 @media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
   .sidebar {
     width: 100%;
     height: auto;
     position: relative;
+    flex-direction: column;
+  }
+
+  .sidebar-nav {
     flex-direction: row;
     flex-wrap: wrap;
+    padding: 8px 12px;
+    gap: 4px;
+  }
+
+  .sidebar-nav a {
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+
+  .sidebar-logo {
+    padding: 16px 20px;
+  }
+
+  .sidebar-footer {
+    display: none;
   }
 
   .main-content {
     margin-left: 0;
+    padding: 16px;
+    min-height: unset;
   }
 }

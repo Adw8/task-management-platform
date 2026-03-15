@@ -239,3 +239,19 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (max-width: 640px) {
+  .detail-card {
+    padding: 20px 16px;
+  }
+
+  .detail-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-meta {
+    grid-template-columns: 1fr;
+  }
+}
