@@ -176,8 +176,9 @@ All routes except `/auth/register`, `/auth/login`, and `/health` require `Author
 
 | Method | Endpoint                | Description                                    |
 |--------|-------------------------|------------------------------------------------|
-| GET    | `/analytics/overview`   | Counts by status, priority, overdue + recent tasks |
-| GET    | `/analytics/trends`     | Daily created/completed counts (last 30 days)  |
+| GET    | `/analytics/overview`     | Counts by status, priority, overdue + recent tasks  |
+| GET    | `/analytics/performance`  | Per-user task counts and completion rates           |
+| GET    | `/analytics/trends`       | Daily created/completed counts (last 30 days)       |
 
 ### GET /tasks — Query Parameters
 

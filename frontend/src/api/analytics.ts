@@ -24,3 +24,16 @@ export async function getTrends(): Promise<TrendsData> {
   const res = await client.get<TrendsData>('/analytics/trends');
   return res.data;
 }
+
+export interface UserPerformance {
+  user_id:     number;
+  user_name:   string;
+  total:       number;
+  done:        number;
+  in_progress: number;
+}
+
+export async function getPerformance(): Promise<UserPerformance[]> {
+  const res = await client.get<UserPerformance[]>('/analytics/performance');
+  return res.data;
+}

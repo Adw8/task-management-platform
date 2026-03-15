@@ -472,6 +472,37 @@ const spec: OpenAPIV3.Document = {
       },
     },
 
+    '/analytics/performance': {
+      get: {
+        summary: 'Get per-user task counts and completion rates',
+        tags: ['Analytics'],
+        security: [bearerAuth],
+        responses: {
+          '200': {
+            description: 'User performance metrics',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      user_id:     { type: 'integer' },
+                      user_name:   { type: 'string' },
+                      total:       { type: 'integer' },
+                      done:        { type: 'integer' },
+                      in_progress: { type: 'integer' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+        },
+      },
+    },
+
     '/analytics/trends': {
       get: {
         summary: 'Get daily task creation and completion counts for the last 30 days',

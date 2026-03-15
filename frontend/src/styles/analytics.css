@@ -98,6 +98,68 @@
   margin-bottom: 0;
 }
 
+.analytics-grid + .analytics-card {
+  margin-top: 16px;
+}
+
+/* User performance table */
+.perf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.perf-table th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.perf-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+.perf-table tr:last-child td { border-bottom: none; }
+
+.perf-name { font-weight: 500; color: #111; }
+.perf-done { color: #16a34a; font-weight: 500; }
+
+.perf-rate-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.perf-track {
+  flex: 1;
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  overflow: hidden;
+  max-width: 120px;
+}
+
+.perf-fill {
+  height: 100%;
+  background: #16a34a;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.perf-pct {
+  font-size: 13px;
+  color: #6b7280;
+  min-width: 36px;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .analytics-summary {

@@ -3,18 +3,19 @@ import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { getOverview, getTrends, type OverviewStats, type TrendsData } from '../api/analytics';
+import { getOverview, getPerformance, getTrends, type OverviewStats, type TrendsData, type UserPerformance } from '../api/analytics';
 import '../styles/analytics.css';
 
 export default function Analytics() {
-  const [overview, setOverview] = useState<OverviewStats | null>(null);
-  const [trends, setTrends]     = useState<TrendsData | null>(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState('');
+  const [overview, setOverview]       = useState<OverviewStats | null>(null);
+  const [trends, setTrends]           = useState<TrendsData | null>(null);
+  const [performance, setPerformance] = useState<UserPerformance[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState('');
 
   useEffect(() => {
-    Promise.all([getOverview(), getTrends()])
-      .then(([ov, tr]) => { setOverview(ov); setTrends(tr); })
+    Promise.all([getOverview(), getTrends(), getPerformance()])
+      .then(([ov, tr, perf]) => { setOverview(ov); setTrends(tr); setPerformance(perf); })
       .catch(() => setError('Failed to load analytics'))
       .finally(() => setLoading(false));
   }, []);
@@ -158,6 +159,44 @@ export default function Analytics() {
           </ResponsiveContainer>
         </div>
       </div>
+      {/* User performance */}
+      {performance.length > 0 && (
+        <div className="analytics-card">
+          <h2>User Performance</h2>
+          <table className="perf-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Total</th>
+                <th>Completed</th>
+                <th>In Progress</th>
+                <th>Completion Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {performance.map((u) => {
+                const rate = u.total > 0 ? Math.round((u.done / u.total) * 100) : 0;
+                return (
+                  <tr key={u.user_id}>
+                    <td className="perf-name">{u.user_name}</td>
+                    <td>{u.total}</td>
+                    <td className="perf-done">{u.done}</td>
+                    <td>{u.in_progress}</td>
+                    <td>
+                      <div className="perf-rate-row">
+                        <div className="perf-track">
+                          <div className="perf-fill" style={{ width: `${rate}%` }} />
+                        </div>
+                        <span className="perf-pct">{rate}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
