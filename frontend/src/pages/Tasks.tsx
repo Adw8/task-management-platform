@@ -5,6 +5,27 @@ import useTaskStore from '../store/taskStore';
 import type { Task, TaskPriority, TaskStatus } from '../types/task';
 import '../styles/tasks.css';
 
+function exportTasksCSV(tasks: Task[]) {
+  const headers = ['ID', 'Title', 'Status', 'Priority', 'Due Date', 'Tags', 'Created'];
+  const rows = tasks.map((t) => [
+    t.id,
+    `"${t.title.replace(/"/g, '""')}"`,
+    t.status,
+    t.priority,
+    t.due_date ? new Date(t.due_date).toLocaleDateString() : '',
+    `"${t.tags.join(', ')}"`,
+    new Date(t.created_at).toLocaleDateString(),
+  ]);
+  const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tasks-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function StatusBadge({ status }: { status: TaskStatus }) {
   const labels: Record<TaskStatus, string> = {
     todo: 'To Do',
@@ -103,9 +124,16 @@ export default function Tasks() {
     <div className="tasks-page">
       <div className="page-header">
         <h1>Tasks</h1>
-        <button className="btn-new-task" onClick={() => setShowNewModal(true)}>
-          + New Task
-        </button>
+        <div className="page-header-actions">
+          {tasks.length > 0 && (
+            <button className="btn-export" onClick={() => exportTasksCSV(tasks)}>
+              Export CSV
+            </button>
+          )}
+          <button className="btn-new-task" onClick={() => setShowNewModal(true)}>
+            + New Task
+          </button>
+        </div>
       </div>
 
       <div className="tasks-toolbar">
