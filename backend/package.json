@@ -9,7 +9,9 @@
     "start": "node dist/index.js",
     "migrate:up": "node-pg-migrate up --envPath .env",
     "migrate:down": "node-pg-migrate down --envPath .env",
-    "migrate:create": "node-pg-migrate create"
+    "migrate:create": "node-pg-migrate create",
+    "seed": "ts-node src/seed.ts",
+    "unseed": "ts-node src/unseed.ts"
   },
   "keywords": [],
   "author": "",

@@ -56,6 +56,40 @@ task-management-platform/
 
 ---
 
+## Demo
+
+Run the seed script after the backend is started to populate the database with 3 users and 14 tasks across all statuses and priorities.
+
+**Local**
+```bash
+cd backend
+npm run seed
+```
+
+**Docker**
+```bash
+docker compose exec backend node dist/seed.js
+```
+
+### Demo credentials
+
+| Name         | Email            | Password    |
+|--------------|------------------|-------------|
+| Alice Johnson | alice@demo.com  | password123 |
+| Bob Smith     | bob@demo.com    | password123 |
+| Carol White   | carol@demo.com  | password123 |
+
+To remove seed data:
+```bash
+# Local
+npm run unseed
+
+# Docker
+docker compose exec backend node dist/unseed.js
+```
+
+---
+
 ## Setup
 
 ### Prerequisites
