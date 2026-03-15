@@ -59,8 +59,9 @@ task-management-platform/
 ## Setup
 
 ### Prerequisites
-- Node.js ≥ 18
+- Node.js ≥ 22
 - PostgreSQL ≥ 14
+- Docker ≥ 24 (for Docker setup)
 
 ### Backend
 
@@ -68,7 +69,7 @@ task-management-platform/
 cd backend
 cp .env.example .env   # fill in values
 npm install
-npm run migrate up     # run migrations
+npm run migrate:up     # run migrations
 npm run dev
 ```
 
@@ -80,6 +81,22 @@ cp .env.example .env
 npm install
 npm run dev
 ```
+
+### Docker
+
+```bash
+# Copy and fill in env vars
+cp backend/.env.example backend/.env
+
+# Build and start all services (postgres, backend, frontend)
+docker compose up --build
+```
+
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`
+- API docs: `http://localhost:3000/api-docs`
+
+Migrations run automatically on backend startup. The `uploads` volume persists file attachments across restarts.
 
 ### Production
 
