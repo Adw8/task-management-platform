@@ -9,6 +9,7 @@ import authRouter from './routes/auth';
 import commentsRouter from './routes/comments';
 import filesRouter from './routes/files';
 import tasksRouter from './routes/tasks';
+import usersRouter from './routes/users';
 import openapiSpec from './openapi';
 
 const app = express();
@@ -40,6 +41,7 @@ app.use('/tasks', tasksRouter);
 app.use('/tasks/:taskId/comments', commentsRouter);
 app.use('/tasks/:taskId/files', filesRouter);
 app.use('/analytics', analyticsRouter);
+app.use('/users', usersRouter);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err);
