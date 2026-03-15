@@ -29,6 +29,12 @@ export const BulkCreateTaskSchema = z.object({
   tasks: z.array(CreateTaskSchema).min(1).max(100),
 });
 
+export const ExportTasksQuerySchema = z.object({
+  status:   TaskStatusEnum.optional(),
+  priority: TaskPriorityEnum.optional(),
+  tags:     z.string().optional(),
+});
+
 export const ListTasksQuerySchema = z.object({
   status: TaskStatusEnum.optional(),
   priority: TaskPriorityEnum.optional(),

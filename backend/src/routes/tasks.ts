@@ -6,6 +6,7 @@ import { authenticate } from '../middleware/auth';
 import {
   BulkCreateTaskSchema,
   CreateTaskSchema,
+  ExportTasksQuerySchema,
   ListTasksQuerySchema,
   UpdateTaskSchema,
 } from '../schemas/task';
@@ -20,6 +21,61 @@ function getUserId(res: Response): number {
   const id = Number(user.sub);
   if (!Number.isFinite(id)) throw new Error('invalid user context');
   return id;
+}
+
+// GET /tasks/export — must be declared before /:id routes
+router.get('/export', async (req, res, next) => {
+  const parsed = ExportTasksQuerySchema.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: z.flattenError(parsed.error) });
+    return;
+  }
+
+  const { status, priority, tags } = parsed.data;
+  const conditions: string[] = ['deleted_at IS NULL'];
+  const params: unknown[] = [];
+  let n = 1;
+
+  if (status)   { conditions.push(`status = $${n++}`);   params.push(status); }
+  if (priority) { conditions.push(`priority = $${n++}`); params.push(priority); }
+  if (tags) {
+    const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean);
+    if (tagList.length > 0) { conditions.push(`tags @> $${n++}::text[]`); params.push(tagList); }
+  }
+
+  try {
+    const result = await pool.query<Task>(
+      `SELECT id, title, status, priority, due_date, tags, description, created_at
+       FROM tasks WHERE ${conditions.join(' AND ')}
+       ORDER BY created_at DESC`,
+      params,
+    );
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="tasks.csv"');
+
+    res.write('ID,Title,Status,Priority,Due Date,Tags,Description,Created\n');
+    for (const row of result.rows) {
+      const cols = [
+        row.id,
+        csvEscape(row.title),
+        row.status,
+        row.priority,
+        row.due_date ? new Date(row.due_date).toISOString().slice(0, 10) : '',
+        csvEscape(row.tags.join(', ')),
+        csvEscape(row.description ?? ''),
+        new Date(row.created_at).toISOString().slice(0, 10),
+      ];
+      res.write(cols.join(',') + '\n');
+    }
+    res.end();
+  } catch (err) {
+    next(err);
+  }
+});
+
+function csvEscape(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
 }
 
 // POST /tasks/bulk — must be declared before /:id routes

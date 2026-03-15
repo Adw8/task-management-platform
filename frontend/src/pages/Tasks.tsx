@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { exportTasks } from '../api/tasks';
 import TaskFormModal from '../components/TaskFormModal';
 import useTaskStore from '../store/taskStore';
 import type { Task, TaskPriority, TaskStatus } from '../types/task';
@@ -103,9 +104,17 @@ export default function Tasks() {
     <div className="tasks-page">
       <div className="page-header">
         <h1>Tasks</h1>
-        <button className="btn-new-task" onClick={() => setShowNewModal(true)}>
-          + New Task
-        </button>
+        <div className="page-header-actions">
+          <button
+            className="btn-export"
+            onClick={() => exportTasks({ status: filters.status, priority: filters.priority, tags: filters.tags })}
+          >
+            Export CSV
+          </button>
+          <button className="btn-new-task" onClick={() => setShowNewModal(true)}>
+            + New Task
+          </button>
+        </div>
       </div>
 
       <div className="tasks-toolbar">
@@ -206,7 +215,7 @@ export default function Tasks() {
                     <td>
                       {task.tags.length > 0 ? (
                         <div className="tags-list">
-                          {task.tags.map((tag) => (
+                          {task.tags.map((tag: string) => (
                             <span key={tag} className="tag">{tag}</span>
                           ))}
                         </div>

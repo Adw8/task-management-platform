@@ -68,6 +68,30 @@
   background: #f3f4f6;
 }
 
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Export button */
+.btn-export {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-export:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
 /* New task button */
 .btn-new-task {
   padding: 8px 16px;
