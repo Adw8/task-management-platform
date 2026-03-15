@@ -4,9 +4,18 @@ import Comments from '../components/Comments';
 import FileUpload from '../components/FileUpload';
 import TaskFormModal from '../components/TaskFormModal';
 import { getTask } from '../api/tasks';
+import { getUsers, type UserSummary } from '../api/users';
 import useTaskStore from '../store/taskStore';
 import type { Task } from '../types/task';
 import '../styles/task-detail.css';
+
+function AssigneeName({ userId }: { userId: number | null }) {
+  const [users, setUsers] = useState<UserSummary[]>([]);
+  useEffect(() => { getUsers().then(setUsers).catch(() => {}); }, []);
+  if (!userId) return <>—</>;
+  const user = users.find((u) => u.id === userId);
+  return <>{user ? user.name : '—'}</>;
+}
 
 export default function TaskDetail() {
   const { id } = useParams<{ id: string }>();
@@ -95,6 +104,12 @@ export default function TaskDetail() {
             <span className="meta-label">Due Date</span>
             <span className="meta-value">
               {task.due_date ? new Date(task.due_date).toLocaleDateString() : '—'}
+            </span>
+          </div>
+          <div className="meta-item">
+            <span className="meta-label">Assignee</span>
+            <span className="meta-value">
+              <AssigneeName userId={task.assigned_to} />
             </span>
           </div>
           <div className="meta-item">

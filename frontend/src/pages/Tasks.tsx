@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { exportTasks } from '../api/tasks';
+import { getUsers, type UserSummary } from '../api/users';
 import TaskFormModal from '../components/TaskFormModal';
 import useTaskStore from '../store/taskStore';
 import type { Task, TaskPriority, TaskStatus } from '../types/task';
@@ -50,6 +51,9 @@ export default function Tasks() {
     useTaskStore();
 
   const [search, setSearch] = useState(filters.search ?? '');
+  const [users, setUsers] = useState<UserSummary[]>([]);
+
+  useEffect(() => { getUsers().then(setUsers).catch(() => {}); }, []);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [editTarget, setEditTarget] = useState<number | null>(null);
@@ -187,6 +191,7 @@ export default function Tasks() {
                   >
                     Due Date{sortIndicator('due_date')}
                   </th>
+                  <th>Assignee</th>
                   <th>Tags</th>
                   <th
                     className={filters.sort_by === 'created_at' ? 'active-sort' : ''}
@@ -210,6 +215,11 @@ export default function Tasks() {
                     <td>
                       {task.due_date
                         ? new Date(task.due_date).toLocaleDateString()
+                        : <span style={{ color: '#9ca3af' }}>—</span>}
+                    </td>
+                    <td>
+                      {task.assigned_to
+                        ? (users.find((u) => u.id === task.assigned_to)?.name ?? '—')
                         : <span style={{ color: '#9ca3af' }}>—</span>}
                     </td>
                     <td>
