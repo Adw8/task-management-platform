@@ -1,26 +1,27 @@
 import { z } from 'zod';
+import { sanitize } from '../utils/sanitize';
 
 export const TaskStatusEnum = z.enum(['todo', 'in_progress', 'done']);
 export const TaskPriorityEnum = z.enum(['low', 'medium', 'high']);
 
 export const CreateTaskSchema = z.object({
-  title: z.string().min(1).max(255),
-  description: z.string().max(5000).optional(),
+  title: z.string().min(1).max(255).transform(sanitize),
+  description: z.string().max(5000).transform(sanitize).optional(),
   status: TaskStatusEnum.optional().default('todo'),
   priority: TaskPriorityEnum.optional().default('medium'),
   due_date: z.iso.datetime().optional(),
-  tags: z.array(z.string().min(1).max(50)).max(20).optional().default([]),
+  tags: z.array(z.string().min(1).max(50).transform(sanitize)).max(20).optional().default([]),
   assigned_to: z.number().int().positive().optional(),
 });
 
 export const UpdateTaskSchema = z
   .object({
-    title: z.string().min(1).max(255).optional(),
-    description: z.string().max(5000).nullable().optional(),
+    title: z.string().min(1).max(255).transform(sanitize).optional(),
+    description: z.string().max(5000).transform(sanitize).nullable().optional(),
     status: TaskStatusEnum.optional(),
     priority: TaskPriorityEnum.optional(),
     due_date: z.iso.datetime().nullable().optional(),
-    tags: z.array(z.string().min(1).max(50)).max(20).optional(),
+    tags: z.array(z.string().min(1).max(50).transform(sanitize)).max(20).optional(),
     assigned_to: z.number().int().positive().nullable().optional(),
   })
   .strict();

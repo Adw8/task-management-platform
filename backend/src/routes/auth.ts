@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import pool from '../db';
 import { authenticate } from '../middleware/auth';
 import { requireEnv } from '../utils/env';
+import { sanitize } from '../utils/sanitize';
 
 const router = Router();
 const JWT_SECRET = requireEnv('JWT_SECRET');
@@ -43,7 +44,7 @@ router.post('/register', async (req, res) => {
 
     const result = await pool.query(
       'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, created_at',
-      [name, email, passwordHash],
+      [sanitize(name), email, passwordHash],
     );
 
     res.status(201).json(result.rows[0]);
