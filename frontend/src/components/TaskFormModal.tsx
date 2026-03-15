@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getTask } from '../api/tasks';
 import useTaskStore from '../store/taskStore';
+import useUsersStore from '../store/usersStore';
 import type { TaskPriority, TaskStatus } from '../types/task';
 import '../styles/task-form-modal.css';
 
@@ -12,6 +13,7 @@ interface FormState {
   due_date: string;
   tags: string[];
   tagInput: string;
+  assigned_to: number | null;
 }
 
 const DEFAULT_FORM: FormState = {
@@ -22,6 +24,7 @@ const DEFAULT_FORM: FormState = {
   due_date: '',
   tags: [],
   tagInput: '',
+  assigned_to: null,
 };
 
 interface Props {
@@ -34,10 +37,15 @@ export default function TaskFormModal({ onClose, taskId }: Props) {
   const { createTask, updateTask } = useTaskStore();
 
   const [form, setForm] = useState<FormState>(DEFAULT_FORM);
+  const { users, fetch: fetchUsers } = useUsersStore();
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
+
+  useEffect(() => {
+    fetchUsers().catch(() => {});
+  }, [fetchUsers]);
 
   useEffect(() => {
     if (!isEdit || !taskId) return;
@@ -51,6 +59,7 @@ export default function TaskFormModal({ onClose, taskId }: Props) {
           due_date: task.due_date ? task.due_date.slice(0, 10) : '',
           tags: task.tags,
           tagInput: '',
+          assigned_to: task.assigned_to ?? null,
         });
       })
       .catch(() => setFormError('Failed to load task'))
@@ -100,6 +109,7 @@ export default function TaskFormModal({ onClose, taskId }: Props) {
       priority: form.priority,
       due_date: form.due_date ? new Date(form.due_date).toISOString() : undefined,
       tags: form.tags,
+      assigned_to: form.assigned_to ?? undefined,
     };
 
     try {
@@ -191,6 +201,22 @@ export default function TaskFormModal({ onClose, taskId }: Props) {
                 onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))}
               />
             </div>
+
+            {users.length > 0 && (
+              <div className="form-group">
+                <label htmlFor="modal-assignee">Assignee</label>
+                <select
+                  id="modal-assignee"
+                  value={form.assigned_to ?? ''}
+                  onChange={(e) => setForm((f) => ({ ...f, assigned_to: e.target.value ? Number(e.target.value) : null }))}
+                >
+                  <option value="">Unassigned</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>{u.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="form-group">
               <label>Tags</label>

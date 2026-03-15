@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import pool from '../db';
 import { authenticate } from '../middleware/auth';
+import { sanitize } from '../utils/sanitize';
 
 const router = Router({ mergeParams: true });
 
@@ -14,7 +15,7 @@ function getUserId(res: any): number {
 }
 
 const CommentBodySchema = z.object({
-  body: z.string().min(1).max(5000),
+  body: z.string().min(1).max(5000).transform(sanitize),
 });
 
 // GET /tasks/:taskId/comments
