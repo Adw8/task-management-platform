@@ -3,11 +3,13 @@ import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import analyticsRouter from './routes/analytics';
 import authRouter from './routes/auth';
 import commentsRouter from './routes/comments';
 import filesRouter from './routes/files';
 import tasksRouter from './routes/tasks';
+import openapiSpec from './openapi';
 
 const app = express();
 const PORT = process.env['PORT'] ?? 3000;
@@ -29,6 +31,8 @@ const authLimiter = rateLimit({
 app.get('/health', async (_req, res) => {
   res.json({ status: 'ok' });
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
 
 app.use('/auth', authLimiter);
 app.use('/auth', authRouter);
