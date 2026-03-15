@@ -248,17 +248,36 @@ All routes except `/auth/register`, `/auth/login`, and `/health` require `Author
 
 ## Design Decisions
 
-- **Raw SQL over ORM** — used `node-pg-migrate` + `node-postgres` directly. More verbose but gives full control over indexes and query shape.
-- **Composite indexes** — `(created_by, status, created_at)` and `(assigned_to, status, created_at)` for common filtered list queries. Partial index on `deleted_at IS NULL`. GIN indexes for tag array containment and full-text search.
-- **Soft deletes** — `deleted_at` column on tasks; all queries filter `WHERE deleted_at IS NULL`.
-- **Authorization** — creator or assigned user can update a task; only the creator can delete it.
-- **JWT in Authorization header** — simpler than httpOnly cookies for this scope.
-- **User list cached in Zustand** — `GET /users` is fetched once on first access and reused across `TaskFormModal`, `TaskDetail`, and the task list. Avoids redundant requests on every mount without adding a data-fetching library.
-- **Zustand over Redux** — less boilerplate, sufficient for auth state + task cache.
-- **Token stored in localStorage** — acceptable for this scope; the 401 interceptor clears stale tokens automatically.
-- **Rate limiting on /auth** — 10 requests per 15 minutes per IP to limit brute-force attempts.
-- **Shared workspace model** — all authenticated users see all tasks, consistent with the assignment spec. Tasks are not scoped per user; `assigned_to` indicates responsibility but does not restrict visibility.
-- **Server-side CSV export** — `GET /tasks/export` streams CSV row-by-row from the database rather than building the full dataset client-side. Avoids loading all task data into browser memory and keeps the download logic out of the frontend bundle. The endpoint accepts `status`, `priority`, and `tags` filters. Search is intentionally excluded — exports are meant for bulk data extraction, not search result snapshots.
+### Database
+
+- **Raw SQL over ORM** — `node-pg-migrate` + `node-postgres` for full control over indexes and query shape.
+- **Composite indexes** — `(created_by, status, created_at)` and `(assigned_to, status, created_at)` for filtered list queries. Partial index on `deleted_at IS NULL`. GIN indexes for tag containment and full-text search.
+- **Tags as a PG array** — `text[]` with a GIN index rather than a join table.
+- **Soft deletes** — `deleted_at` column; all queries filter `WHERE deleted_at IS NULL`.
+- **Offset pagination** — simple `page`/`limit`; tradeoff is inconsistency under concurrent writes.
+- **Migrations run on startup** — convenient for single-instance deployments; multi-instance prod would need a separate migration step.
+
+### Auth & Security
+
+- **JWT in Authorization header** — stateless, no session store. Token stored in localStorage; 401 interceptor clears stale tokens automatically.
+- **No refresh tokens** — long-lived access tokens; acceptable for this scope.
+- **Rate limiting on `/auth`** — 10 requests per 15 minutes per IP.
+
+### Authorization & Access Control
+
+- **Update/delete rules** — creator or assignee can update; only creator can delete.
+- **Shared workspace** — all authenticated users see all tasks; `assigned_to` indicates responsibility but does not restrict visibility.
+
+### Frontend State
+
+- **Zustand over Redux** — less boilerplate, sufficient for auth state and task cache.
+- **User list cached in Zustand** — `GET /users` fetched once on first access, reused across components to avoid redundant requests.
+
+### API & Files
+
+- **Server-side CSV export** — `GET /tasks/export` streams rows directly from the database. Accepts `status`, `priority`, and `tags` filters; search excluded since exports are for bulk extraction.
+- **Disk file storage** — Multer stores files on the local filesystem; would need object storage (e.g. S3) for horizontal scaling.
+- **No real-time updates** — pull-only; no WebSocket or polling.
 
 ---
 
