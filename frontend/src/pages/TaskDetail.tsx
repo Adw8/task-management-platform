@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import Comments from '../components/Comments';
+import FileUpload from '../components/FileUpload';
 import TaskFormModal from '../components/TaskFormModal';
 import { getTask } from '../api/tasks';
 import useTaskStore from '../store/taskStore';
@@ -116,6 +118,9 @@ export default function TaskDetail() {
           </div>
         )}
       </div>
+
+      <FileUpload taskId={task.id} />
+      <Comments taskId={task.id} />
 
       {showEditModal && task && (
         <TaskFormModal

@@ -5,6 +5,8 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import analyticsRouter from './routes/analytics';
 import authRouter from './routes/auth';
+import commentsRouter from './routes/comments';
+import filesRouter from './routes/files';
 import tasksRouter from './routes/tasks';
 
 const app = express();
@@ -31,6 +33,8 @@ app.get('/health', async (_req, res) => {
 app.use('/auth', authLimiter);
 app.use('/auth', authRouter);
 app.use('/tasks', tasksRouter);
+app.use('/tasks/:taskId/comments', commentsRouter);
+app.use('/tasks/:taskId/files', filesRouter);
 app.use('/analytics', analyticsRouter);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

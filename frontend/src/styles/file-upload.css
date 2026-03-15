@@ -1,0 +1,136 @@
+.file-upload-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.file-upload-section h2 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 12px;
+}
+
+.file-count {
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.drop-zone {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+  margin-bottom: 12px;
+}
+
+.drop-zone:hover {
+  border-color: #2563eb;
+  background: #f8faff;
+}
+
+.drop-zone--active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.drop-zone--uploading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.drop-zone-icon {
+  font-size: 24px;
+}
+
+.drop-zone-text {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.drop-zone-hint {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.file-error {
+  font-size: 13px;
+  color: #dc2626;
+  margin-bottom: 8px;
+}
+
+.files-loading {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.file-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 6px;
+}
+
+.file-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.file-name {
+  font-size: 14px;
+  color: #2563eb;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-name:hover { text-decoration: underline; }
+
+.file-meta {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.btn-file-delete {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #9ca3af;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.btn-file-delete:hover { color: #dc2626; }
